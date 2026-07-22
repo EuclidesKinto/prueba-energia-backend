@@ -1,0 +1,4 @@
+-- Executado automaticamente pelo container mysql na primeira inicialização.
+-- O schema em si já é criado via MYSQL_DATABASE (docker-compose.yml); nada
+-- adicional é necessário no momento, mas o arquivo é mantido para permitir
+-- extensões futuras (grants, charset, dados de referência) sem mexer no compose.

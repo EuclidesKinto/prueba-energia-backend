@@ -1,0 +1,231 @@
+{
+	"info": {
+		"name": "Prueba-Energia API",
+		"description": "Laravel REST API for computing indexed electricity prices (OMIE_MD). See docs/guia/PARTE-1-Guia-Backend-Laravel.md for the full business rules.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:8000",
+			"type": "string"
+		}
+	],
+	"item": [
+		{
+			"name": "Calculate",
+			"item": [
+				{
+					"name": "200 - Calculate indexed price (full month)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"start_date\": \"2025-03-01\",\n  \"end_date\": \"2025-03-31\",\n  \"formula\": \"([OMIE_MD] * 0.6) + 0.88\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/calculate",
+							"host": [ "{{base_url}}" ],
+							"path": [ "api", "v1", "calculate" ]
+						}
+					}
+				},
+				{
+					"name": "200 - Calculate indexed price (via /calculate alias)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"start_date\": \"2025-03-10\",\n  \"end_date\": \"2025-03-20\",\n  \"formula\": \"([OMIE_MD] * 0.5) + 1.0\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/calculate",
+							"host": [ "{{base_url}}" ],
+							"path": [ "calculate" ]
+						}
+					}
+				},
+				{
+					"name": "400 - Formula missing [OMIE_MD]",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"start_date\": \"2025-03-01\",\n  \"end_date\": \"2025-03-31\",\n  \"formula\": \"0.5 + 0.1\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/calculate",
+							"host": [ "{{base_url}}" ],
+							"path": [ "api", "v1", "calculate" ]
+						}
+					}
+				},
+				{
+					"name": "400 - Missing required fields",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"end_date\": \"2025-03-31\",\n  \"formula\": \"([OMIE_MD] * 0.6) + 0.88\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/calculate",
+							"host": [ "{{base_url}}" ],
+							"path": [ "api", "v1", "calculate" ]
+						}
+					}
+				},
+				{
+					"name": "400 - end_date before start_date",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"start_date\": \"2025-03-31\",\n  \"end_date\": \"2025-03-01\",\n  \"formula\": \"([OMIE_MD] * 0.6) + 0.88\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/calculate",
+							"host": [ "{{base_url}}" ],
+							"path": [ "api", "v1", "calculate" ]
+						}
+					}
+				},
+				{
+					"name": "400 - Formula with invalid syntax",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"start_date\": \"2025-03-01\",\n  \"end_date\": \"2025-03-01\",\n  \"formula\": \"([OMIE_MD] * 0.6\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/calculate",
+							"host": [ "{{base_url}}" ],
+							"path": [ "api", "v1", "calculate" ]
+						}
+					}
+				},
+				{
+					"name": "404 - Missing data in range",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"start_date\": \"2024-01-01\",\n  \"end_date\": \"2024-01-05\",\n  \"formula\": \"([OMIE_MD] * 0.6) + 0.88\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/calculate",
+							"host": [ "{{base_url}}" ],
+							"path": [ "api", "v1", "calculate" ]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Consumptions",
+			"item": [
+				{
+					"name": "200 - Paginated list",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{base_url}}/api/v1/consumptions?per_page=5",
+							"host": [ "{{base_url}}" ],
+							"path": [ "api", "v1", "consumptions" ],
+							"query": [
+								{ "key": "per_page", "value": "5" }
+							]
+						}
+					}
+				},
+				{
+					"name": "200 - Filter by date range",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{base_url}}/api/v1/consumptions?start_date=2025-03-01&end_date=2025-03-07",
+							"host": [ "{{base_url}}" ],
+							"path": [ "api", "v1", "consumptions" ],
+							"query": [
+								{ "key": "start_date", "value": "2025-03-01" },
+								{ "key": "end_date", "value": "2025-03-07" }
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Prices",
+			"item": [
+				{
+					"name": "200 - Paginated list",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{base_url}}/api/v1/prices?per_page=5",
+							"host": [ "{{base_url}}" ],
+							"path": [ "api", "v1", "prices" ],
+							"query": [
+								{ "key": "per_page", "value": "5" }
+							]
+						}
+					}
+				},
+				{
+					"name": "200 - Filter by date range",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{base_url}}/api/v1/prices?start_date=2025-03-01&end_date=2025-03-07",
+							"host": [ "{{base_url}}" ],
+							"path": [ "api", "v1", "prices" ],
+							"query": [
+								{ "key": "start_date", "value": "2025-03-01" },
+								{ "key": "end_date", "value": "2025-03-07" }
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Health",
+			"item": [
+				{
+					"name": "200 - Health check",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{base_url}}/api/v1/health",
+							"host": [ "{{base_url}}" ],
+							"path": [ "api", "v1", "health" ]
+						}
+					}
+				}
+			]
+		}
+	]
+}
